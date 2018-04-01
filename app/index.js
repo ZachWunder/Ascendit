@@ -4,24 +4,25 @@ const EMA = require('technicalindicators').EMA
 const ask = fns.askPrice('USDT-ADA')
 const bid = fns.bidPrice('USDT-ADA')
 
-function sell (amountOfBalance) {
-
+const sell = (positionSize, marketname) => { 
+    //position size in decimal
+    bittrex.tradesell({
+        MarketName: marketName,
+        OrderType: 'LIMIT',
+        Quantity: positionSize * fns.balance(currency),
+        Rate: value,
+        TimeInEffect: 'GOOD_TIL_CANCELED', 
+        ConditionType: 'NONE', 
+        Target: 0, 
+    }, function( data, err ) {
+        console.log( data );
+    })
 }
 function sellAtAsk() {
     ask
         .then(value => {
             console.log("ask: " + value);
-            bittrex.tradesell({
-                MarketName: 'USDT-ADA',
-                OrderType: 'LIMIT',
-                Quantity: 1.00000000,
-                Rate: value,
-                TimeInEffect: 'GOOD_TIL_CANCELED', // supported options are 'IMMEDIATE_OR_CANCEL', 'GOOD_TIL_CANCELLED', 'FILL_OR_KILL'
-                ConditionType: 'NONE', 
-                Target: 0, 
-              }, function( data, err ) {
-                console.log( data );
-              });
+            
         })
         .catch(error => {
             console.log("there was an error: " + error);

@@ -1,12 +1,12 @@
-const bittrex = require('node-bittrex-api');
+const readBittrex = require('node-readBittrex-api');
 const secrets = require('./secrets')
-bittrex.options(secrets)
+readBittrex.options(secrets)
 
 module.exports = {
 
-    balance: function(currency, callback) { 
+    balance: function(currency) { 
         return new promise((resolve, reject) => { 
-            bittrex.getbalance({ currency : currency }, function( data, err ) {
+            readBittrex.getbalance({ currency : currency }, function( data, err ) {
                 if (err) { reject(err) }
                 else { resolve(data.result) } 
             })
@@ -15,7 +15,7 @@ module.exports = {
     
     askPrice: function(currency) {
         return new Promise((resolve, reject) => {
-            bittrex.getorderbook({ market : 'USDT-ADA', type : 'sell' }, (data, err) => {
+            readBittrex.getorderbook({ market : 'USDT-ADA', type : 'sell' }, (data, err) => {
                 if (err) { reject(err) }
                 else { resolve(data.result[0].Rate) }  
             })
@@ -24,7 +24,7 @@ module.exports = {
     
     bidPrice: function(currency) {
         return new Promise((resolve, reject) => {
-            bittrex.getorderbook({ market : 'USDT-ADA', type : 'buy' }, (data, err) => {
+            readBittrex.getorderbook({ market : 'USDT-ADA', type : 'buy' }, (data, err) => {
                 if (err) { reject(err) }
                 else { resolve(data.result[0].Rate) }
             })

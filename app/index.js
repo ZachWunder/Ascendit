@@ -1,6 +1,7 @@
 const fns = require('./bittrexFunctions')
 const EMA = require('technicalindicators').EMA
 
+
 const ask = fns.askPrice('USDT-ADA')
 const bid = fns.bidPrice('USDT-ADA')
 
@@ -26,3 +27,8 @@ function placeBuyOrder() {
             console.log("there was an error: " + error);
         });
 }
+
+let x = () => {
+    console.log(await fns.balance('ADA'))
+}
+x()

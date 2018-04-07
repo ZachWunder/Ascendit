@@ -1,2 +1,5 @@
-app/secrets.json
+app/readSecrets.json
+app/accountSecrets.json
 node_modules/*
+app/test.js
+app/openOrders.txt

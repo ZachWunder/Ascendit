@@ -1,13 +1,26 @@
 const readBittrex = require('node-bittrex-api');
-const secrets = require('./secrets')
+const readSecrets = require('./readSecrets')
 readBittrex.options(readSecrets)
-accountBittrex.options(accountSecrets)
+//marketBittrex.options(marketSecrets)
+//accountBittrex.options(accountSecrets)
 
 module.exports = {
 
+    currentSpread: async (currency) => {
+      return new Promise((resolve, reject) => {
+        readBittrex.getticker({ market : 'USDT-ADA'}, (data, err) => {
+            if (err) { reject(err) }
+            else {
+              const spread = (1 - (data.result.Bid / data.result.Ask)) * 100
+              resolve(spread)
+            }
+        })
+      })
+    },
+
     balance : async currency => {
         return new Promise((resolve, reject) => {
-            readBittrex.getbalance({ currency : currency }, function( data, err ) {
+            accountBittrex.getbalance({ currency : currency }, function( data, err ) {
                 if (err) { reject(err) }
                 else { resolve(data.result) }
             })
@@ -17,7 +30,7 @@ module.exports = {
 
     sell : async function (market, quantity, price) {
         const url = 'https://bittrex.com/api/v1.1/market/selllimit?market=' + market + '&quantity=' + quantity + '&rate=' + price;
-        readBittrex.sendCustomRequest(url, (data, err) => {
+        marketBittrex.sendCustomRequest(url, (data, err) => {
             return new Promise((resolve, reject) => {
                 if (err) { reject(err) }
                 else { resolve(data.result.uuid) }
@@ -27,7 +40,7 @@ module.exports = {
 
     buy : async function (market, quantity, price) {
         const url = 'https://bittrex.com/api/v1.1/market/buylimit?market=' + market + '&quantity=' + quantity + '&rate=' + price;
-        readBittrex.sendCustomRequest(url, (data, err) => {
+        marketBittrex.sendCustomRequest(url, (data, err) => {
             return new Promise((resolve, reject) => {
                 if (err) { reject(err) }
                 else { resolve(data.result.uuid) }
@@ -37,18 +50,18 @@ module.exports = {
 
     askPrice : async function (currency) {
         return new Promise((resolve, reject) => {
-            readBittrex.getorderbook({ market : 'USDT-ADA', type : 'sell' }, (data, err) => {
+            readBittrex.getticker({ market : 'USDT-ADA'}, (data, err) => {
                 if (err) { reject(err) }
-                else { resolve(data.result[0].Rate) }
+                else { resolve(data.result.Ask) }
             })
         })
     },
 
     bidPrice : async function (currency) {
         return new Promise((resolve, reject) => {
-            readBittrex.getorderbook({ market : 'USDT-ADA', type : 'buy' }, (data, err) => {
+            readBittrex.getticker({ market : 'USDT-ADA'}, (data, err) => {
                 if (err) { reject(err) }
-                else { resolve(data.result[0].Rate) }
+                else { resolve(data.result.Bid) }
             })
         })
     }

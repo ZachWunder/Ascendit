@@ -1,6 +1,5 @@
 const fns = require('./bittrexFunctions')
 const fs = require('fs')
-const EMA = require('technicalindicators').EMA
 
 function sellAtAsk (currency, positionSize, spread) {
   const ask = await fns.askPrice(currency);

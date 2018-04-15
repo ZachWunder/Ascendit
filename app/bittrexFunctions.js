@@ -1,4 +1,6 @@
 const readBittrex = require('node-bittrex-api');
+//const marketBittrex = require('node-bittrex-api');
+//const accountBittrex = require('node-bittrex-api');
 const readSecrets = require('./readSecrets')
 readBittrex.options(readSecrets)
 //marketBittrex.options(marketSecrets)

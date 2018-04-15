@@ -7,7 +7,7 @@ readBittrex.options(readSecrets)
 async function candles (period) {
    return new Promise((resolve, reject) => {
      readBittrex.getcandles(
-       {marketName: 'USDT-ADA', tickInterval: 'thirtyMin'},
+       {marketName: 'USDT-ADA', tickInterval: 'fiveMin'},
        (data, err) => {
          if (err) { reject(err) }
          else {
@@ -23,22 +23,21 @@ async function candles (period) {
 
 async function EMASlope(period, values) {
   return new Promise((resolve, reject) => {
-    const period = 12
     let average = EMA.calculate({period: period, values: values})
     if (average === null || average === undefined) {reject('empty')}
     else { resolve(average) }
   })
 }
 
-modules.export = {
-  test: async function () {
+module.exports = {
+  ema: async function (period) {
     try {
-      let values = await candles()
-      let emavalues = await EMASlope(values)
+      let values = await candles(period)
+      let emavalues = await EMASlope(period, values)
+      console.log(emavalues)
       return emavalues
     }
     catch (error) {
-      console.log(error)
       throw error
     }
   }

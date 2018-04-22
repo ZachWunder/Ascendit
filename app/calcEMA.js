@@ -24,8 +24,8 @@ async function candles (period) {
 async function EMASlope(period, values) {
   return new Promise((resolve, reject) => {
     let average = EMA.calculate({period: period, values: values})
-    if (average === null || average === undefined) {reject('empty')}
-    else { resolve(average) }
+    if (average === null || average === undefined) reject('empty')
+    else  resolve(average)
   })
 }
 
@@ -34,7 +34,6 @@ module.exports = {
     try {
       let values = await candles(period)
       let emavalues = await EMASlope(period, values)
-      console.log(emavalues)
       return emavalues
     }
     catch (error) {

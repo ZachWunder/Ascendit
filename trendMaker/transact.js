@@ -1,7 +1,7 @@
-const fns = require('./bittrexFunctions')
+const fns = require('app/bittrexFunctions')
 const fs = require('fs')
 
-function sellAtAsk (currency, positionSize, spread) {
+async function sellAtAsk (currency, positionSize, spread) {
   const ask = await fns.askPrice(currency);
   const balance = await fns.balance(currency);
 
@@ -13,7 +13,7 @@ function sellAtAsk (currency, positionSize, spread) {
                 (err) => { if (err) throw err });
 }
 
-function buyAtBid (positionSize, spread) {
+async function buyAtBid (positionSize, spread) {
   const bid = await fns.bidPrice(currency);
   const balance = await fns.balance('USDT');
 

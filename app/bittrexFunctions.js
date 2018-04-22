@@ -8,10 +8,19 @@ readBittrex.options(readSecrets)
 
 module.exports = {
 
+    getOrder : async (uuid) => {
+      return new Promise((resolve, reject) => {
+        readBittrex.getorder(uuid, (data, err) => {
+          if (err) reject(err)
+          else resolve(data.result)
+        })
+      })
+    },
+
     currentSpread: async (currency) => {
       return new Promise((resolve, reject) => {
         readBittrex.getticker({ market : 'USDT-ADA'}, (data, err) => {
-            if (err) { reject(err) }
+            if (err) reject(err)
             else {
               const spread = (1 - (data.result.Bid / data.result.Ask)) * 100
               resolve(spread)

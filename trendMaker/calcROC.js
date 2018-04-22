@@ -1,7 +1,7 @@
 const readBittrex = require('node-bittrex-api');
-const readSecrets = require('./readSecrets');
+const readSecrets = require('app/readSecrets');
 const roc = require('technicalindicators').ROC;
-const fns = require('./bittrexFunctions');
+const fns = require('app/bittrexFunctions');
 readBittrex.options(readSecrets)
 
 async function candles (period) {
@@ -16,16 +16,17 @@ async function candles (period) {
            for (let i = 0; i < retrievedCandles.length; i++) {
              values.push(retrievedCandles[i].C)
            }
-           resolve(values)}
+           resolve(values)
+         }
        })
      })
 }
 
-async function ROC(period, values) {
+async function createROC(period, values) {
   return new Promise((resolve, reject) => {
     let average = roc.calculate({period: 1, values: values})
-    if (average === null || average === undefined) {reject('empty')}
-    else { resolve(average) }
+    if (average === null || average === undefined) reject('empty')
+    else resolve(average)
   })
 }
 
@@ -33,7 +34,6 @@ module.exports = {
   ROC: async function (period) {
     try {
       let values = await candles(period)
-      console.log(values)
       let ROCvalues = await ROC(period, values)
       return ROCvalues
     }

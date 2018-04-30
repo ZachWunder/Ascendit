@@ -1,14 +1,15 @@
-interface Strategy {
-     capital : number
-     state : string
-     riskTolerance : number
-     control: string
-     start() : void
-     stop() : void
-}
+import { Strategy } from "./strategy";
+
+
+
+const getOrder = require('./bittrexFunctions.js').getOrder
+const buyAtBid = require('./transact').buyAtBid
+const sellAtAsk = require('./transact').sellAtAsk
 
 class TrendMaker implements Strategy {
 
+
+	riskTolerance: number;
 	APIPollTimeout: number;
 	state: string;
 	control: string;
@@ -26,6 +27,7 @@ class TrendMaker implements Strategy {
      }
 
 
+
   //TODO: Abstract to new file
   private updateOrders () {
     let buyOrder = getOrder(this.orders.buy)
@@ -40,18 +42,12 @@ class TrendMaker implements Strategy {
       return 'neither'
   }
 
-  start () {
-    this.control = 'on'
-    while (this.control === 'on') {
-      setTimeout( function () {
-        let orderOutcome = this.updateOrders()
-        if (orderOutcome == 'both') {
-          this.orders.buy = buyAtBid() //
-          this.orders.sell = sellAtAsk() //
-
-        }
-      }
-        , this.APIPollTimeout)
-    }
+  newTick () : void {
+	  let orderOutcome = this.updateOrders()
+	  if (orderOutcome == 'both') {
+	    this.orders.buy = buyAtBid() //
+	    this.orders.sell = sellAtAsk() //
+	}
   }
+
 }

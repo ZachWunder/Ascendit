@@ -21,6 +21,6 @@ async function buyAtBid (positionSize, spread) {
   const price = bid + (spread / 2)
 
   const orderUUID = await fns.sell('USDT-ADA', quantity, bid);
-  fs.watchFile('openBuyOrders.txt', orderUUID + '\n', {'flag' : 'a'},
+  fs.writeFile('openBuyOrders.txt', orderUUID + '\n', {'flag' : 'a'},
                 (err) => { if (err) throw err });
 }

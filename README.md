@@ -1,6 +1,6 @@
-# NodeCryptoBot
+# Ascendit
 
-NodeJS implementation of a cryptocurrency trading bot.
+NodeJS implementation of a bullish cryptocurrency trading bot.
 
 ## Setup:
 

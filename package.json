@@ -1,7 +1,7 @@
 {
-  "name": "cryptobot",
+  "name": "Ascendit",
   "version": "1.0.1",
-  "description": "Crypto Bot Trading Platform",
+  "description": "Bullish Crypto Trading - In progress",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

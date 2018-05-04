@@ -1,10 +1,11 @@
-import { Strategy } from "./strategy";
+import { Strategy } from "../strategy";
 
-
-
+//helper function imports
 const getOrder = require('./bittrexFunctions.js').getOrder
 const buyAtBid = require('./transact').buyAtBid
 const sellAtAsk = require('./transact').sellAtAsk
+const cancel = require('app/bittrexFunctions').cancel
+const calcROC = require('./calcROC').calcROC
 
 class TrendMaker implements Strategy {
 
@@ -12,42 +13,45 @@ class TrendMaker implements Strategy {
 	riskTolerance: number;
 	APIPollTimeout: number;
 	state: string;
-	control: string;
 	orders: { buy: any; sell: any; };
 	risk: number;
 	capital: number;
 
-     constructor (capital : number, riskTolerance : number) {
-          this.capital = capital
-          this.risk = riskTolerance
-          this.orders = {buy: null, sell: null}
-          this.control = 'off'
-          this.state = 'running'
-          this.APIPollTimeout = 15000
-     }
+	constructor (capital : number, riskTolerance : number) {
+		this.capital = capital
+		this.risk = riskTolerance
+    this.state = 'running'
+    this.APIPollTimeout = 15000
 
 
-
-  //TODO: Abstract to new file
-  private updateOrders () {
-    let buyOrder = getOrder(this.orders.buy)
-    let sellOrder = getOrder(this.orders.sell)
-    if (buyOrder.Quantity == 0 && sellOrder.Quantity == 0)
-      return 'both'
-    else if (sellOrder.Quantity == 0)
-      return 'sell'
-    else if (buyOrder.Quantity == 0)
-      return 'buy'
-    else
-      return 'neither'
-  }
-
-  newTick () : void {
-	  let orderOutcome = this.updateOrders()
-	  if (orderOutcome == 'both') {
-	    this.orders.buy = buyAtBid() //
-	    this.orders.sell = sellAtAsk() //
 	}
-  }
+
+	private async start () {
+		let buyOrder = await buyAtBid()
+		let sellOrder = await sellAtAsk()
+		this.orders = {buy: buyOrder, sell: sellOrder}
+	}
+
+
+	public async newTick () {
+		let update = await this.updateOrders()
+		if (update == 'none') {
+			return true
+		}
+		else if (update == 'both' && calcROC > 0) {
+		//log buy and sell orders to DB
+	  	this.orders.buy = await buyAtBid()
+	    this.orders.sell = await sellAtAsk()
+		}
+		else if (update == 'sell' && calcROC) {
+			//log sell order
+			cancel(this.orders.buy)
+			this.orders.buy = await buyAtBid()
+			this.orders.sell = await sellAtAsk()
+		}
+		else if (update == 'buy') {
+			this.control = 'stopped'
+		}
+	}
 
 }

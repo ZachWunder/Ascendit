@@ -1,5 +1,5 @@
 const fns = require('app/bittrexFunctions')
-const fs = require('fs')
+
 
 async function sellAtAsk (currency, positionSize, spread) {
   const ask = await fns.askPrice(currency);
@@ -9,8 +9,11 @@ async function sellAtAsk (currency, positionSize, spread) {
   const price = ask + (spread / 2)
 
   const orderUUID = await fns.sell('USDT-ADA', quantity, price);
-  fs.writeFile('openSellOrders.txt', orderUUID + '\n', {'flag' : 'a'},
-                (err) => { if (err) throw err });
+  return new Promise ( (resolve, reject) => {
+    if (orderUUID)
+      resolve(orderUUID)
+    else {
+      reject('error')
 }
 
 async function buyAtBid (positionSize, spread) {
@@ -21,6 +24,28 @@ async function buyAtBid (positionSize, spread) {
   const price = bid + (spread / 2)
 
   const orderUUID = await fns.sell('USDT-ADA', quantity, bid);
-  fs.writeFile('openBuyOrders.txt', orderUUID + '\n', {'flag' : 'a'},
-                (err) => { if (err) throw err });
+
+  return new Promise ( (resolve, reject) => {
+    if (orderUUID)
+      resolve(orderUUID)
+    else {
+      reject('error')
+    }
+  })
+}
+
+async updateOrders (strategyObject) {
+  let buyOrder = await getOrder(strategyObject.orders.buy)
+  let sellOrder = await getOrder(strategyObject.orders.sell)
+  return new Promise( (resolve, reject) => {
+    if (buyOrder.Quantity == 0 && sellOrder.Quantity == 0)
+      resolve('both')
+    else if (sellOrder.Quantity == 0)
+      resolve('sell')
+    else if (buyOrder.Quantity == 0)
+      resolve('buy')
+    else
+      resolve('none')
+
+  })
 }

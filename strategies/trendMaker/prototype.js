@@ -5,7 +5,7 @@ const cancel = require('app/bittrexFunctions').cancel
 const calcROC = require('./calcROC').calcROC
 const updateOrders = require('./transact.js').updateOrders
 
-const TrendMaker = {
+export const TrendMaker = {
   start : async (capital) => {
     this.capital = capital
     this.state = 'running'

@@ -34,7 +34,7 @@ export const TrendMaker = {
 			this.orders.sell = await sellAtAsk()
 		}
 		else if (update == 'buy') {
-			this.state = 'stopped'
+			console.log('Stopped due to buy')
 		}
   }
 }

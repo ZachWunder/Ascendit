@@ -1,23 +1,30 @@
-class Test {
-     constructor () {
-          this.control = true
-     }
+/*const Connection = require('../../app/DBConnections')
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema;
 
-     on () {
-          this.control = true
-     }
-     off () {
-          this.control = false
-     }
+const db = mongoose.connect(Connection.Mongo)
 
-     async main() {
-          while (this.control = true) {
-               console.log('on')
-          }
-     }
+const testSchema = new Schema({
+	name: String,
+	number: Number
+})
+
+const Test = mongoose.model('Test', testSchema)
+
+const newTest = Test({
+	name: 'firstTest',
+	number: 1
+})
+
+newTest.save( () => {
+	if (err) throw err;
+	console.log('Success')
+})*/
+
+function x () {
+	console.log('x');
 }
 
-let test = new Test()
-
-test.main()
-setTimeout(() => test.off(), 500)
+(function y () {
+	return x()
+})()

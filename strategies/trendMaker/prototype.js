@@ -1,40 +1,58 @@
-const getOrder = require('./bittrexFunctions.js').getOrder
+//DB Declarations
+const mongoose = require('mongoose')
+const Connection = require(../app/DBConnections)
+const db = mongoose.connect(Connection.Mongo)
+//CCXT Declarations
+const ccxt = require('ccxt')
+const getOrder = require('./bittrexFunctions.js').getOrder,
 const buyAtBid = require('./transact').buyAtBid
 const sellAtAsk = require('./transact').sellAtAsk
-const cancel = require('app/bittrexFunctions').cancel
 const calcROC = require('./calcROC').calcROC
 const updateOrders = require('./transact.js').updateOrders
 
-export const TrendMaker = {
-  start : async (capital) => {
-    this.capital = capital
-    this.state = 'running'
-    this.APIPollTimeout = 15000
-    // create initial orders
-    let buyOrder = await buyAtBid()
-    let sellOrder = await sellAtAsk()
-    this.orders = {buy: buyOrder, sell: sellOrder}
-    // build in DB logging redundancy
+
+const TrendMaker = {
+ 	start : async (capital) => {
+	    this.capital = capital
+	    this.state = 'running'
+	    this.APIPollTimeout = 15000
+	    // create initial orders
+		try {
+	    	let buyOrder = await buyAtBid()
+	    	let sellOrder = await sellAtAsk()
+		}
+		catch (error) {
+			throw error
+		}
+	    this.orders = { buy: buyOrder, sell: sellOrder}
+	    // build in DB logging redundancy
   }
 
-  newTick : async () => {
-    let update = await updateOrders()
-    if (update == 'none') {
-			console.log('No update')
+	newTick : async () => {
+		try {
+			let update = await updateOrders()
+			let momentum = calcROC()
+
+			if (update == 'none') {
+				console.log('No update')
+			}
+			else if (update == 'both' && momentum > -4) {
+				//log buy and sell orders to DB
+				this.orders.buy = await buyAtBid()
+				this.orders.sell = await sellAtAsk()
+			}
+			else if (update == 'sell' && momentum > -4 && momentum < 4) {
+				//log sell order
+				transactBittrex.cancelOrder(this.orders.buy)
+				this.orders.buy = await buyAtBid()
+				this.orders.sell = await sellAtAsk()
+			}
+			else if (update == 'buy') {
+				console.log('Stopped due to buy')
+			}
 		}
-		else if (update == 'both' && calcROC() > 0) {
-		//log buy and sell orders to DB
-	  	this.orders.buy = await buyAtBid()
-	    this.orders.sell = await sellAtAsk()
+		catch (error) {
+	  		return error
 		}
-		else if (update == 'sell' && calcROC() > 0) {
-			//log sell order
-			cancel(this.orders.buy)
-			this.orders.buy = await buyAtBid()
-			this.orders.sell = await sellAtAsk()
-		}
-		else if (update == 'buy') {
-			console.log('Stopped due to buy')
-		}
-  }
+	}
 }

@@ -1,51 +1,100 @@
-const fns = require('app/bittrexFunctions')
+const ccxt = require('ccxt')
+const bittrex = new ccxt.bittrex()
+const transactBittrex = new ccxt.bittrex({
+	apikey: x,
+	apisecret: y,
+})
 
+async function Buy (price, quantity, options) {
+	if (options.bid) {
+		return buyAtBid()
+	}
+	else {
 
-async function sellAtAsk (currency, positionSize, spread) {
-  const ask = await fns.askPrice(currency);
-  const balance = await fns.balance(currency);
-
-  const quantity = balance * positionSize
-  const price = ask + (spread / 2)
-
-  const orderUUID = await fns.sell('USDT-ADA', quantity, price);
-  return new Promise ( (resolve, reject) => {
-    if (orderUUID)
-      resolve(orderUUID)
-    else {
-      reject('error')
+	}
 }
 
-async function buyAtBid (positionSize, spread) {
-  const bid = await fns.bidPrice(currency);
-  const balance = await fns.balance('USDT');
 
-  const quantity = balance * positionSize
-  const price = bid + (spread / 2)
+async function sellAtAsk (currency, positionSize=1) {
+	try {
+		const orderBook = await bittrex.fetchOrderBook('ADA/USDT')
+	  	const ask = orderBook.bids[0][0]
+	  	const bid = orderBook.asks[0][0]
+	  	const naturalSpread = Math.abs(ask / bid)
+	  	const quantity = balance * positionSize
 
-  const orderUUID = await fns.sell('USDT-ADA', quantity, bid);
+		if (naturalSpread > 2) { const price = (ask + naturalSpread) / 2 }
+	  	else { const price = ask + (2 - naturalSpread) / 2) }
 
-  return new Promise ( (resolve, reject) => {
-    if (orderUUID)
-      resolve(orderUUID)
-    else {
-      reject('error')
-    }
-  })
+		try {
+			const orderUUID = await transactBittrex.createLimitSellOrder(
+			currency, quantity, price)
+		}
+		catch (e) { console.log(e) }
+
+		return new Promise ( (resolve, reject) => {
+		    if (orderUUID)
+				resolve(orderUUID.result.uuid)
+			else {
+				reject('error')
+		}
+	}
+	catch (error) {
+		return error
+	}
 }
 
-async updateOrders (strategyObject) {
-  let buyOrder = await getOrder(strategyObject.orders.buy)
-  let sellOrder = await getOrder(strategyObject.orders.sell)
-  return new Promise( (resolve, reject) => {
-    if (buyOrder.Quantity == 0 && sellOrder.Quantity == 0)
-      resolve('both')
-    else if (sellOrder.Quantity == 0)
-      resolve('sell')
-    else if (buyOrder.Quantity == 0)
-      resolve('buy')
-    else
-      resolve('none')
+async function buyAtBid (currency, positionSize=1) {
+	try {
+		const orderBook = await bittrex.fetchOrderBook('ADA/USDT')
+	  	const ask = orderBook.bids[0][0]
+	  	const bid = orderBook.asks[0][0]
+	  	const naturalSpread = Math.abs(ask / bid)
+	  	const quantity = balance * positionSize
 
-  })
+		if (naturalSpread > 2) { const price = (bid - naturalSpread) / 2 }
+	  	else { const price = bid - (2 - naturalSpread) / 2) }
+
+		const orderUUID = await transactBittrex.createLimitBuyOrder(
+		currency, quantity, price)
+
+
+		return new Promise ( (resolve, reject) => {
+	    if (orderUUID)
+			resolve(orderUUID.result.uuid)
+		else {
+			reject('error')
+		}
+	}
+	catch (error) {
+		return error
+	}
+}
+//added order UUID
+async updateOrders (//here) {
+	try {
+		let buyOrder = await transactBittrex.fetchOrder(//here)
+		let sellOrder = await transactBittrex.fetchOrder(//here)
+
+		return new Promise( (resolve, reject) => {
+			if (buyOrder.Quantity == 0 && sellOrder.Quantity == 0)
+				resolve('both')
+			else if (sellOrder.Quantity == 0)
+				resolve('sell')
+			else if (buyOrder.Quantity == 0)
+				resolve('buy')
+			else
+				resolve('none')
+
+			})
+	}
+	catch (error) {
+		return error
+	}
+}
+
+modules.export = {
+	sellAtAsk : sellAtAsk(),
+	buyAtBid : buyAtBid(),
+	updateOrders : updateOrders()
 }

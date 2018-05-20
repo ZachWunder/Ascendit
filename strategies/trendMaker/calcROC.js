@@ -1,44 +1,29 @@
-const readBittrex = require('node-bittrex-api');
-const readSecrets = require('app/readSecrets');
-const roc = require('technicalindicators').ROC;
-const fns = require('app/bittrexFunctions');
-readBittrex.options(readSecrets)
-
-async function candles (period) {
-   return new Promise((resolve, reject) => {
-     readBittrex.getcandles(
-       {marketName: 'USDT-ADA', tickInterval: 'fiveMin'},
-       (data, err) => {
-         if (err) { reject(err) }
-         else {
-           let retrievedCandles = data.result.slice(data.result.length - period)
-           let values = []
-           for (let i = 0; i < retrievedCandles.length; i++) {
-             values.push(retrievedCandles[i].C)
-           }
-           resolve(values)
-         }
-       })
-     })
-}
-
-async function createROC(period, values) {
-  return new Promise((resolve, reject) => {
-    let average = roc.calculate({period: 1, values: values})
-    if (average === null || average === undefined) reject('empty')
-    else resolve(average)
-  })
-}
+const ccxt = require('ccxt')
+const bittrex = new ccxt.bittrex()
 
 module.exports = {
-  ROC: async function (period) {
+  ROC: async function (period=12) {
     try {
-      let values = await candles(period)
-      let ROCvalues = await ROC(period, values)
-      return ROCvalues
-    }
-    catch (error) {
-      throw error
-    }
-  }
+		let closingPrices = []
+		let candleDataTemp = await bittrex.fetchOHLCV ("ADA/USDT", '5m')
+
+		let candleData = candleDataTemp.slice(-period)
+
+		candleData.forEach((candle) => {
+				closingPrices.push(candle[4])
+		})
+
+		let avgRate = (( closingPrices[closingPrices.length - 1] - closingPrices[0] )
+					  / closingPrices[closingPrices.length - 1] ) * 100
+
+		return new Promise((resolve, reject) => {
+			if (avgRate) resolve(avgRate)
+			else reject('Average Rate of Change missing.')
+		})
+	}
+	catch (error) {
+			return error
+	}
+
+	}
 }

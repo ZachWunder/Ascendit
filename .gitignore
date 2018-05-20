@@ -2,4 +2,5 @@ app/readSecrets.json
 app/accountSecrets.json
 node_modules/*
 app/test.js
-app/openOrders.txt
+app/DBConnections.json
+strategies/trendMaker/backtesting

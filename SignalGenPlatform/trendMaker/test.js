@@ -19,12 +19,4 @@ const newTest = Test({
 newTest.save( () => {
 	if (err) throw err;
 	console.log('Success')
-})*/
-
-function x () {
-	console.log('x');
-}
-
-(function y () {
-	return x()
-})()
+}*/

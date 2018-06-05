@@ -1,0 +1,5 @@
+{
+	"OHLCV": [{"CurrencyPair" : "ADA/USDT",
+			   "TimeFrame" : "30m"}],
+	"OrderBook": ["ADA/USDT"]
+}

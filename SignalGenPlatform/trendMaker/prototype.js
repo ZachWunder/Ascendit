@@ -15,7 +15,6 @@ const TrendMaker = {
  	start : async (capital) => {
 	    this.capital = capital
 	    this.state = 'running'
-	    this.APIPollTimeout = 15000
 	    // create initial orders
 		try {
 	    	let buyOrder = await buyAtBid()

@@ -3,4 +3,5 @@ app/accountSecrets.json
 node_modules/*
 app/test.js
 app/DBConnections.json
-strategies/trendMaker/backtesting
+misc/trendMaker
+ExecutionPlatform/secrets/realSecrets

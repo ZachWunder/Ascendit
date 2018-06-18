@@ -1,11 +1,19 @@
-const SignalGenerator = require('../SignalGenPlatform/trendMaker');
+const SignalGenerator = require('../SignalGenPlatform/trendMaker').TrendMakerSignalGenerator;
+const RunningSignalGenerator = require('../SignalGenPlatform/trendMaker')
+										.RunningTrendMakerSignalGenerator;
 const RPManagement = require('../RiskPortfolioPlatform/trendMaker');
 
 const TrendMaker = function(currencyPair) {
 
-    //Create initial orders
+	//check if theres an open order
+	if (database.hasOpenOrder) {
+		const Signal = new SignalGenerator(currencyPair);
+	}
+	else {
+		const Signal = new RunningSignalGenerator(currencyPair);
+	}
 
-    const Signal = new SignalGenerator(currencyPair);
+
     const RPM = new RPManagement(currencyPair);
     const Execute = require('../ExecutionPlatform/trendMaker');
 

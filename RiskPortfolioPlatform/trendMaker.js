@@ -24,15 +24,16 @@ const calcVolatility = async () => {
 
 
 class RiskPortfolioManagement extends EventEmitter {
-    constructor (currencyPair) {
-        this.currencyPair = currencyPair
+    constructor (currencyPair, capital) {
+        this.currencyPair = currencyPair;
+		this.capital = capital;
     }
 
     checkBuy (maxVolatility) {
         const volatility = await calcVolatility();
         if (volatility < maxVolatility) {
             this.emit('newOrder', {
-
+				bittrex.
             })
         }
     }

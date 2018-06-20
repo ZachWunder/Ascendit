@@ -1,11 +1,12 @@
 const mongoose = require('mongoose');
-const straddleOrderSchema = new mongoose.Schema({
+const trendMakerOrderSchema = new mongoose.Schema({
+	CurrencyPair : String,
 	BuyID : String,
 	SellID : String
 });
 
-const straddleOrder = mongoose.model('Candle', candleSchema);
+const TrendMaker = mongoose.model('TrendMaker', trendMakerOrderSchema);
 
 module.exports = {
-	Candle: Candle
+	TrendMaker : TrendMaker
 };

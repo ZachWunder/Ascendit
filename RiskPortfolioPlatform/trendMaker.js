@@ -2,6 +2,7 @@ const ccxt = require('ccxt');
 const bittrex = new ccxt.bittrex();
 
 const calcVolatility = async () => {
+    //*** NOT EVEN CLOSE TO DONE, FIX***//
     return new Promise(function(resolve, reject) {
         try {
             let OHLCV = await bittrex.fetchOHLCV('currencyPair');
@@ -24,35 +25,18 @@ const calcVolatility = async () => {
 
 
 class RiskPortfolioManagement extends EventEmitter {
-    constructor (currencyPair, capital) {
+    constructor (currencyPair) {
+        super();
         this.currencyPair = currencyPair;
-		this.capital = capital;
     }
 
-    checkBuy (maxVolatility) {
+    checkNewOrder (maxVolatility) {
         const volatility = await calcVolatility();
         if (volatility < maxVolatility) {
-            this.emit('newOrder', {
-				bittrex.
-            })
+            this.emit('newOrder');
         }
-    }
-
-    checkSell (maxVolatility) {
-        const volatility = await calcVolatility();
-        if (volatility < maxVolatility) {
-            this.emit('newOrder', {
-
-            })
-        }
-    }
-
-    checkBoth (maxVolatility) {
-        const volatility = await calcVolatility();
-        if (volatility < maxVolatility) {
-            this.emit('newOrder', {
-
-            })
+        else {
+            this.emit('newOrderDenied');
         }
     }
 

@@ -1,0 +1,8 @@
+TODO :
+1) Rewrite RPManagement volatility calculation to stop trading in trend and high volatility
+2) Fix and connect strategy TrendMaker to reflect changes
+3) Rewrite Execution to change onSell *Maybe*
+
+Next Major:
+Refactor to replace bittrex with backtesting or other exchange.
+Fake API?

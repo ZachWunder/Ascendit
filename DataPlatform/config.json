@@ -1,5 +1,7 @@
 {
 	"OHLCV": [{"CurrencyPair" : "ADA/USDT",
-			   "TimeFrame" : "30m"}],
-	"OrderBook": ["ADA/USDT"]
+			   "TimeFrame" : "30m",
+			   "Exchange" : "bittrex"}],
+	"OrderBook": [{"CurrencyPair" : "ADA/USDT",
+				   "Exchange" : "bittrex"}]
 }

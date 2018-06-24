@@ -1,38 +1,16 @@
 const ccxt = require('ccxt');
-const bittrex = new ccxt.bittrex();
 
-const calcVolatility = async () => {
-    //*** NOT EVEN CLOSE TO DONE, FIX***//
-    return new Promise(function(resolve, reject) {
-        try {
-            let OHLCV = await bittrex.fetchOHLCV('currencyPair');
-            // Max volatility calculation
-            let recentOHLCV = OHLCV.slice(-12);
-            let total;
-            for (let i = 1; i < recentOHLCV.length; i++) {
-                totalVolatility += abs(recentOHLCV[i] - recentOHLCV[i-1]) / recentOHLCV[i-1];
-            }
-            const volatility = totalVolatility / recentOHLCV.length;
-
-            resolve(volatility);
-        }
-        catch (e) {
-            reject(e);
-        }
-    });
-}
-
-
-
-class RiskPortfolioManagement extends EventEmitter {
-    constructor (currencyPair) {
+class RiskManagement extends EventEmitter {
+    constructor (exchange, currencyPair, risk) {
         super();
+        this.acceptableDeviation = risk;
         this.currencyPair = currencyPair;
+        this.exchange = new ccxt[exchange]();
     }
 
-    checkNewOrder (maxVolatility) {
-        const volatility = await calcVolatility();
-        if (volatility < maxVolatility) {
+    checkNewOrder () {
+        const accepted = await identifyTrend();
+        if (accepted) {
             this.emit('newOrder');
         }
         else {
@@ -40,8 +18,39 @@ class RiskPortfolioManagement extends EventEmitter {
         }
     }
 
+    private async identifyTrend (acceptableDeviation) => {
+        return new Promise(function(resolve, reject) {
+            try {
+                const OHLCV = await this.exchange.fetchOHLCV(currencyPair, "30m");
+
+                //Get the highest and lowest prices over the last 12 30m candles,
+                //The average value is the mean of these
+                const recentPrices = OHLCV.slice(-12);
+                const minValue = Math.min(...recentPrices);
+                const maxValue = Math.max(...recentPrices);
+
+                const averageValue = (minValue + maxValue) / 2;
+                const currentPrice = OHLCV[OHLCV.length - 1]
+
+                // If currentPrice is too far from averagePrice reject order
+                // otherwise, accept order
+                let acceptOrder;
+                if (abs(currentPrice / averagePrice) > acceptableDeviation) {
+                    acceptOrder = true;
+                }
+                else {
+                    acceptOrder = false;
+                }
+                resolve(acceptOrder);
+            }
+            catch (e) {
+                reject(e);
+            }
+        });
+    }
+
 }
 
 module.exports = {
-    RiskPortfolioManagement : RiskPortfolioManagement
+    RiskManagement : RiskManagement
 }

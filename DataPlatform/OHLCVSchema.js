@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const candleSchema = new mongoose.Schema({
+	Exchange : String,
 	Time: Number,
 	Open: Number,
 	High: Number,

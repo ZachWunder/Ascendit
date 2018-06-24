@@ -9,7 +9,7 @@
   "author": "Zach Wunder",
   "license": "ISC",
   "dependencies": {
-    "ccxt": "^1.13.100",
+    "ccxt": "^1.14.230",
     "mongodb": "^3.0.7",
     "mongoose": "^5.0.17",
     "node-bittrex-api": "^0.8.3",

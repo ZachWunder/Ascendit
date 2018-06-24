@@ -14,8 +14,8 @@ const config = require('./config');
 			getOHLCV(ticker.CurrencyPair, ticker.TimeFrame);
 		});
 		//BidAsk
-		config.OrderBook.forEach( pair => {
-			getBidAsk(pair);
+		config.OrderBook.forEach( BidAsk => {
+			getBidAsk(BidAsk.Exchange, BidAsk.CurrencyPair);
 		});
 	}
 	catch (e) {

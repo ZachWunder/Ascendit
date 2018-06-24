@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const BidAskSchema = new mongoose.Schema({
-	Time: { type: Date, default: new Date() },
+	Exchange : String,
+	Time: Number,
 	Bid: Number,
 	Ask: Number,
 	CurrencyPair: String,

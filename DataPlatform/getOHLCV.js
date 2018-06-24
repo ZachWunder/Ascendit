@@ -1,16 +1,18 @@
 const ccxt = require('ccxt');
 const mongoose = require('mongoose');
-const bittrex = new ccxt.bittrex();
 const Candle = require('./OHLCVSchema').Candle;
 
-const saveData = async (currencyPair, timeFrame) => {
+const saveData = async (exchange, currencyPair, timeFrame) => {
 	try {
 		await mongoose.connect('mongodb://localhost:27017/OHLCV');
 
+		const exchangeObj = new ccxt[exchange]();
+
 		let candleDocs = [];
-		let data = await fetchData(currencyPair, timeFrame);
+		let data = await exchangeObj.fetchOHLCV(currencyPair, timeFrame);
 		data.forEach( dataCandle => {
 			candleDocs.push( new Candle({
+				Exchange : exchange
 				Time: dataCandle[0],
 				Open: dataCandle[1],
 				High: dataCandle[2],
@@ -41,18 +43,5 @@ const saveData = async (currencyPair, timeFrame) => {
 	}
 }
 
-const fetchData = async (currencyPair, timeFrame) => {
-	try {
-		let data = await bittrex.fetchOHLCV(currencyPair, timeFrame);
-		return new Promise( (resolve, reject) => {
-			if(data) resolve(data);
-			else reject('exchange interaction issue');
-		})
-	}
-	catch(e) {
-		throw e;
-	}
-
-};
 
 exports.getOHLCV = saveData;

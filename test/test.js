@@ -1,20 +1,40 @@
-const ccxt = require('ccxt');
+const EventEmitter = require('events').EventEmitter;
 
 class test {
-    constructor (exchange) {
-        this.exchange = exchange;
-        this.bittrex = new ccxt[this.exchange]();
+    constructor (emitter) {
+		this.emitter = emitter;
+
+		this.emitter.on('created', () => {
+			console.log('constructor created');
+		});
+
+		this.emitter.on('testEmit', () => {
+			console.log('testEmitted')
+		});
     }
 
-    async test () {
+	newTick() {
+		setInterval(() => {
+			this.emitter.createSignal();
+		}, 50)
+	}
 
-        console.log(await this.bittrex.fetchOHLCV('ADA/USDT'));
-    }
+
+
 }
 
-let x = new test('bittrex');
+class emitter extends EventEmitter{
+	constructor () {
+		super();
+		this.emit('created');
+	}
 
-(async function() {
-    await x.test()
+	createSignal () {
+		this.emit('testEmit')
+	}
+}
 
-}());
+let y = new emitter();
+let x = new test(y);
+
+x.newTick();

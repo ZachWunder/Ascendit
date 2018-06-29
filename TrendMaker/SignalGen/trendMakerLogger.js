@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const fullLoggerSchema = new mongoose.Schema({
+	StrategyName: String,
 	Exchange : String,
 	CurrencyPair : String,
 	Bought : Number,
@@ -10,6 +11,7 @@ const fullLoggerSchema = new mongoose.Schema({
 });
 
 const buyLoggerSchema = new mongoose.Schema({
+	StrategyName: String,
 	Exchange : String,
 	CurrencyPair : String,
 	Bought : Number,
@@ -18,6 +20,7 @@ const buyLoggerSchema = new mongoose.Schema({
 });
 
 const sellLoggerSchema = new mongoose.Schema({
+	StrategyName: String,
 	Exchange : String,
 	CurrencyPair : String,
 	Sold : Number,

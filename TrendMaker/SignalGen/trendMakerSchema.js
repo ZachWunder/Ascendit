@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const trendMakerOrderSchema = new mongoose.Schema({
+	StrategyName: String,
 	Exchange : String,
 	CurrencyPair : String,
 	BuyID : String,

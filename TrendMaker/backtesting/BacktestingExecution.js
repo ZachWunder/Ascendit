@@ -1,23 +1,23 @@
 // *** Create new orders and replace ID's in DB *** //
 const mongoose = require('mongoose');
-const TrendMakerDB = require('./SignalGen/trendMakerSchema').TrendMaker;
-const MongoConnectionURI = require('../app/DBConnections').Mongo;
+const TrendMakerDB = require('../SignalGen/trendMakerSchema').TrendMaker;
+const backtestExchange = require('./BacktestExchange').Exchange;
+const MongoConnectionURI = require('../../app/DBConnections').Mongo;
 const ccxt = require('ccxt');
 
 mongoose.connect(MongoConnectionURI);
 
-class TrendMakerExecution {
-
+class BacktestingExecution {
     constructor (exchange, currencyPair, currencyAmount, targetProfitPercentage) {
+
         console.log('IMPORTANT: Ensure your account has an equivalent amount of USDT!');
 
-        this.targetProfitPercentage = targetProfitPercentage;
+        this.targetProfitPercentage = targetProfitPercentage
         this.exchangeName = exchange;
         this.currencyAmount = currencyAmount;
         this.currencyPair = currencyPair;
-        this.exchange = new ccxt[exchange]();
-        this.exchange.apiKey = secrets.exchange.key;
-        this.exchange.apiSecret = secrets.exchange.secret;
+        this.backtestExchange = new backtestExchange(currencyAmount, exchange);
+        this.exchange = new ccxt[exchange] ();
     }
 
     async createInitialOrders () {
@@ -37,11 +37,12 @@ class TrendMakerExecution {
 
     async onSell () {
         try {
-            await this.exchange.cancel(await TrendMaker.find({
+            /*  await this.exchange.cancel(await TrendMaker.find({
                 Exchange : this.exchangeName,
                 CurrencyPair : this.currencyPair }));
+                */
 
-            createStraddleOrders();
+            this.createStraddleOrders();
         }
         catch (e) {
             console.log(e);
@@ -51,11 +52,8 @@ class TrendMakerExecution {
 
     async createStraddleOrders () {
         try {
-            let buyOrderID = await this.exchange.createLimitBuyOrder(this.currencyPair, this.currencyAmount, orderPrices.buyPrice());
-            let sellOrderID = await this.exchange.createLimitSellOrder(this.currencyPair, this.currencyAmount, orderPrices.sellPrice());
-
-            TrendMakerDB.updateBuyOrder();
-            TrendMakerDB.updateSellOrder();
+            let buyOrderID = this.backtestExchange.createLimitBuyOrder(this.currencyAmount, await this.buyPrice());
+            let sellOrderID = this.backtestExchange.createLimitSellOrder(this.currencyAmount, await this.sellPrice());
         }
         catch (e) {
             console.log(e);
@@ -64,20 +62,18 @@ class TrendMakerExecution {
     }
 
     async sellPrice () {
+        const TPP = this.targetProfitPercentage;
+        const orderBook = await this.exchange.fetchOrderBook(this.currencyPair);
         return new Promise(async function(resolve, reject) {
             try {
-                const orderBook = await this.exchange.fetchOrderBook(this.currencyPair);
+                //When backtesting just change these and feed in with a for loop
                 const bid = orderBook.bids[0][0];
                 const ask = orderBook.asks[0][0];
                 //Calculate spread, accounting for prices being weird
                 const naturalSpread = (bid < ask ? bid / ask : ask / bid);
 
-                if (naturalSpread > this.targetProfitPercentage) {
-                    const price = ask;
-                }
-                else {
-                    const price = ask + ((this.targetProfitPercentage - naturalSpread) / 2);
-                }
+                const price = naturalSpread > TPP ? ask : (ask + ((TPP - naturalSpread) / 2))
+
                 resolve(price);
             }
             catch (e) {
@@ -87,20 +83,18 @@ class TrendMakerExecution {
     }
 
     async buyPrice () {
+        const TPP = this.targetProfitPercentage;
+        const orderBook = await this.exchange.fetchOrderBook(this.currencyPair);
         return new Promise(async function(resolve, reject) {
             try {
-                const orderBook = await this.exchange.fetchOrderBook(this.currencyPair);
+                //When backtesting just change these and feed in with a for loop
                 const bid = orderBook.bids[0][0];
                 const ask = orderBook.asks[0][0];
                 //Calculate spread, accounting for prices being weird
                 const naturalSpread = (bid < ask ? bid / ask : ask / bid);
 
-                if (naturalSpread > this.targetProfitPercentage) {
-                    const price = bid;
-                }
-                else {
-                    const price = bid - ((this.targetProfitPercentage - naturalSpread) / 2);
-                }
+                const price = naturalSpread > TPP ? bid : (bid - ((TPP - naturalSpread) / 2))
+
                 resolve(price);
             }
             catch (e) {
@@ -111,5 +105,5 @@ class TrendMakerExecution {
 }
 
 module.exports = {
-    Execution : TrendMakerExecution
+    BacktestingExecution : BacktestingExecution
 }

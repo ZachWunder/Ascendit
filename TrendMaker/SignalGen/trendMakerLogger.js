@@ -28,7 +28,7 @@ const sellLoggerSchema = new mongoose.Schema({
 	Time : { type: Date, default: Date.now() }
 });
 
-const TMLogger = mongoose.model('TMLogger', fullloggerSchema);
+const TMLogger = mongoose.model('TMLogger', fullLoggerSchema);
 const BuyLogger = mongoose.model('BuyLogger', buyLoggerSchema);
 const SellLogger = mongoose.model('SellLogger', sellLoggerSchema);
 

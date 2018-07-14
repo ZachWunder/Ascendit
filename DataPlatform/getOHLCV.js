@@ -4,7 +4,7 @@ const Candle = require('./OHLCVSchema').Candle;
 
 const saveData = async (exchange, currencyPair, timeFrame) => {
 	try {
-		await mongoose.connect('mongodb://localhost:27017/OHLCV');
+		await mongoose.connect('mongodb://ZachWunder:eworatomaRY1@ds231501.mlab.com:31501/ascendittesting');
 
 		const exchangeObj = new ccxt[exchange]();
 
@@ -12,7 +12,7 @@ const saveData = async (exchange, currencyPair, timeFrame) => {
 		let data = await exchangeObj.fetchOHLCV(currencyPair, timeFrame);
 		data.forEach( dataCandle => {
 			candleDocs.push( new Candle({
-				Exchange : exchange
+				Exchange : exchange,
 				Time: dataCandle[0],
 				Open: dataCandle[1],
 				High: dataCandle[2],
@@ -44,4 +44,6 @@ const saveData = async (exchange, currencyPair, timeFrame) => {
 }
 
 
-exports.getOHLCV = saveData;
+module.exports = {
+	getOHLCV : saveData
+}

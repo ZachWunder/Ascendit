@@ -1,0 +1,3 @@
+{
+    "ActiveStrategies" : [{"TrendMaker" : [{"exchange":"bittrex", "currencyPair" : "ADA/USDT", "currencyAmount": 5000, "risk" : 5, "targetProfitPercentage" : 2, "backtesting": true}]}]
+}

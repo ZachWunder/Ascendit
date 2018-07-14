@@ -2,8 +2,10 @@ const ccxt = require('ccxt');
 const mongoose = require('mongoose');
 const BidAsk = require('./BidAskSchema').BidAsk;
 
-const getOrderBook = async (exchange, currencyPair) => {
+const getBidAsk = async (exchange, currencyPair) => {
 	try {
+		mongoose.connect('mongodb://ZachWunder:eworatomaRY1@ds231501.mlab.com:31501/ascendittesting')
+
 		const exchange = new ccxt[exchange]();
 		const orderBook = await exchange.fetchOrderBook(currencyPair);
 		const Bids = orderBook.bids[0][0];
@@ -17,7 +19,7 @@ const getOrderBook = async (exchange, currencyPair) => {
 			Ask : Asks,
 			CurrencyPair : currencyPair
 		});
-		
+
 	}
 	catch (e) {
 		console.log(e)
@@ -27,4 +29,6 @@ const getOrderBook = async (exchange, currencyPair) => {
 	}
 
 }
-exports.getBidAsk = getOrderBook;
+module.exports = {
+	getBidAsk : getBidAsk
+}

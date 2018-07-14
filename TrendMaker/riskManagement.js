@@ -1,4 +1,5 @@
 const ccxt = require('ccxt');
+const EventEmitter = require('events').EventEmitter;
 
 class RiskManagement extends EventEmitter {
     constructor (exchange, currencyPair, risk) {
@@ -8,7 +9,7 @@ class RiskManagement extends EventEmitter {
         this.exchange = new ccxt[exchange]();
     }
 
-    checkNewOrder () {
+    async checkNewOrder () {
         const accepted = await identifyTrend();
         if (accepted) {
             this.emit('newOrder');
@@ -16,10 +17,11 @@ class RiskManagement extends EventEmitter {
         else {
             this.emit('newOrderDenied');
         }
-    }
+    };
 
-    private async identifyTrend (acceptableDeviation) => {
-        return new Promise(function(resolve, reject) {
+    //acceptableDeviation is in % ex. 2
+    identifyTrend (acceptableDeviation) {
+        return new Promise(async function(resolve, reject) {
             try {
                 const OHLCV = await this.exchange.fetchOHLCV(currencyPair, "30m");
 
@@ -48,7 +50,6 @@ class RiskManagement extends EventEmitter {
             }
         });
     }
-
 }
 
 module.exports = {

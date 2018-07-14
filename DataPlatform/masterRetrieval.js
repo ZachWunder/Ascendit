@@ -11,11 +11,11 @@ const config = require('./config');
 	try {
 		//OHLCV
 		config.OHLCV.forEach(ticker => {
-			getOHLCV(ticker.CurrencyPair, ticker.TimeFrame);
+			getOHLCV(ticker.Exchange, ticker.CurrencyPair, ticker.TimeFrame);
 		});
 		//BidAsk
-		config.OrderBook.forEach( BidAsk => {
-			getBidAsk(BidAsk.Exchange, BidAsk.CurrencyPair);
+		config.OrderBook.forEach( ticker => {
+			getBidAsk(ticker.Exchange, ticker.CurrencyPair);
 		});
 	}
 	catch (e) {

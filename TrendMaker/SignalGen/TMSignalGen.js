@@ -1,6 +1,8 @@
 const EventEmitter = require('events').EventEmitter;
 
 const mongoose = require('mongoose');
+const MongoConnectionURI = require('../../app/DBConnections').Mongo;
+
 const TrendMakerDB = require('./trendMakerSchema').TrendMaker;
 const FullOrderLogger = require('./trendMakerLogger').TMLogger;
 const BuyLogger = require('./trendMakerLogger').BuyLogger;
@@ -11,12 +13,11 @@ const ccxt = require('ccxt');
 class TrendMakerSignalGenerator extends EventEmitter {
     constructor(exchange, currencyPair) {
         super();
-
         this.exchangeName = exchange;
         this.currencyPair = currencyPair;
         this.exchange = new ccxt[exchange]();
 
-        await mongoose.connect('mongodb://localhost:27017/trendMaker');
+        mongoose.connect(MongoConnectionURI);
     }
 
     async check () {

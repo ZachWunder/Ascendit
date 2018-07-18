@@ -21,6 +21,4 @@ class Order extends EventEmitter {
     }
 }
 
-module.exports = {
-    Order : Order
-}
+export default Order;

@@ -12,7 +12,10 @@ class TrendMaker {
         this.risk = risk;
         this.targetProfitPercentage = targetProfitPercentage;
         this.backtesting = backtesting;
+
         this.running = "stopped"; // "off" : initial not created, "stopped" : initial created, "on" : running
+        //Signal Generation's intervald ID
+        this.intervalID = "";
 
         this.SignalGen = new SignalGenerator (exchange, currencyPair);
         this.RiskManagement = new RiskManagement (exchange, currencyPair, risk)
@@ -25,13 +28,21 @@ class TrendMaker {
             Execution.createInitialOrders();
 
             //Generate new signals every 15 seconds
-            setInterval(() => { this.Signal.check() }, 15000);
+            this.intervalID = setInterval(() => { this.Signal.check() }, 15000);
             //Send signal to RManagement
             this.Signal.on('BothFilled', () =>{ RM.checkNewOrder() });
             //Send Approved Order to execution
             this.RiskManagement.on('newOrder', () => { OrderExecute.onSell() });
         }
         else if (this.running === "stop") {
+            this.running = true;
+
+            //Generate new signals every 15 seconds
+            setInterval(() => { this.Signal.check() }, 15000);
+            //Send signal to RManagement
+            this.Signal.on('BothFilled', () =>{ RM.checkNewOrder() });
+            //Send Approved Order to execution  
+            this.RiskManagement.on('newOrder', () => { OrderExecute.onSell() });
 
         }
         else {
@@ -42,7 +53,7 @@ class TrendMaker {
 
     stop () {
         if (this.running) {
-
+            clearInterval(this.intervalID);
         }
         else {
             console.log('Already Stopped')

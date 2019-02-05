@@ -1,3 +1,4 @@
+# Deprecated
 # Ascendit
 
 NodeJS cryptocurrency trading platform.
